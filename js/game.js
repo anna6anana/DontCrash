@@ -171,6 +171,7 @@ function startFrenzy() {
     finished: false,
   };
   State.screen = 'frenzy';
+  document.body.classList.add('frenzy-mode');
   render();
   startFrenzyTimer();
 }
@@ -225,9 +226,19 @@ function nextFrenzyQuestion() {
   }
 }
 
+function exitFrenzy() {
+  if (confirm('Exit the frenzy? Your progress won\'t be saved.')) {
+    if (State.frenzy.timerHandle) clearInterval(State.frenzy.timerHandle);
+    document.body.classList.remove('frenzy-mode');
+    State.screen = 'map';
+    render();
+  }
+}
+
 function finishFrenzy() {
   if (State.frenzy.timerHandle) clearInterval(State.frenzy.timerHandle);
   State.frenzy.finished = true;
+  document.body.classList.remove('frenzy-mode');
 
   const passed =
     State.frenzy.rulesScore >= 16 &&
