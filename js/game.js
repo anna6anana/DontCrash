@@ -202,6 +202,18 @@ function selectFrenzyAnswer(val) {
   render();
 }
 
+function selectFrenzyMCQ(idx) {
+  if (State.frenzy.answered || State.frenzy.finished) return;
+  State.frenzy.selected = idx;
+  State.frenzy.answered = true;
+
+  const q = State.frenzy.questions[State.frenzy.qIdx];
+  if (idx === q.answer) {
+    State.frenzy.rulesScore++;
+  }
+  render();
+}
+
 function nextFrenzyQuestion() {
   State.frenzy.selected = null;
   State.frenzy.answered = false;
