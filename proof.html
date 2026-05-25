@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Don't Crash — Answer Proof Sheet</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; color: #222; }
+    h1 { font-size: 1.4rem; margin-bottom: 4px; }
+    .meta { color: #666; font-size: 0.85rem; margin-bottom: 20px; }
+    .section-title {
+      font-size: 1.1rem; font-weight: bold; background: #333; color: #fff;
+      padding: 8px 14px; border-radius: 6px; margin: 28px 0 12px;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .q-row {
+      background: #fff; border: 1px solid #ddd; border-radius: 6px;
+      padding: 12px 14px; margin-bottom: 8px;
+      display: grid; grid-template-columns: 40px 1fr; gap: 8px;
+    }
+    .q-num { font-weight: bold; color: #888; font-size: 0.85rem; padding-top: 2px; }
+    .q-text { font-weight: bold; font-size: 0.9rem; margin-bottom: 6px; }
+    .options { display: flex; flex-direction: column; gap: 3px; }
+    .opt {
+      font-size: 0.85rem; padding: 4px 8px; border-radius: 4px;
+      display: flex; gap: 6px; align-items: flex-start;
+    }
+    .opt.correct { background: #dcfce7; border: 1.5px solid #22c55e; font-weight: bold; }
+    .opt-letter { min-width: 18px; font-weight: bold; color: #555; }
+    .flag { color: #ef4444; font-size: 0.75rem; font-weight: bold; margin-left: 6px; }
+    .filter-bar {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center;
+    }
+    .filter-bar button {
+      padding: 6px 14px; border-radius: 50px; border: 2px solid #ccc;
+      background: #fff; cursor: pointer; font-size: 0.85rem; font-weight: bold;
+    }
+    .filter-bar button.active { background: #333; color: #fff; border-color: #333; }
+    #search {
+      padding: 7px 14px; border-radius: 50px; border: 2px solid #ccc;
+      font-size: 0.85rem; flex: 1; min-width: 200px;
+    }
+    .count { font-size: 0.8rem; color: #888; margin-left: auto; }
+    .rules-color  { background: #ff6b6b; }
+    .signs-color  { background: #ffb347; }
+    .signals-color{ background: #7ec8e3; }
+  </style>
+  <script src="js/data.js"></script>
+</head>
+<body>
+  <h1>🔍 Don't Crash — Answer Proof Sheet</h1>
+  <p class="meta">Use this to verify every question and its correct answer against the PDF. Green = marked correct answer.</p>
+
+  <div class="filter-bar">
+    <button class="active" onclick="setFilter('all', this)">All</button>
+    <button onclick="setFilter('rules', this)">📋 Road Rules</button>
+    <button onclick="setFilter('signs', this)">🚧 Road Signs</button>
+    <button onclick="setFilter('signals', this)">🤚 Hand Signals</button>
+    <input id="search" type="text" placeholder="Search questions..." oninput="applySearch()"/>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div id="content"></div>
+
+  <script>
+    const LETTERS = ['a','b','c','d'];
+    let currentFilter = 'all';
+
+    const SECTIONS = [
+      { key: 'rules',   label: '📋 Road Rules',   color: 'rules-color',   data: ROAD_RULES },
+      { key: 'signs',   label: '🚧 Road Signs',   color: 'signs-color',   data: ROAD_SIGNS },
+      { key: 'signals', label: '🤚 Hand Signals', color: 'signals-color', data: HAND_SIGNALS },
+    ];
+
+    function buildHTML(filter, searchText) {
+      let html = '';
+      let total = 0;
+      SECTIONS.forEach(sec => {
+        if (filter !== 'all' && filter !== sec.key) return;
+        const search = searchText.toLowerCase();
+        const qs = sec.data.filter(q =>
+          !search || q.q.toLowerCase().includes(search) ||
+          q.options.some(o => o.toLowerCase().includes(search))
+        );
+        if (!qs.length) return;
+        total += qs.length;
+        html += `<div class="section-title ${sec.color}">${sec.label} — ${qs.length} questions</div>`;
+        qs.forEach((q, i) => {
+          const globalIdx = sec.data.indexOf(q);
+          html += `<div class="q-row">
+            <div class="q-num">${globalIdx + 1}</div>
+            <div>
+              <div class="q-text">${q.q}</div>
+              <div class="options">`;
+          q.options.forEach((opt, oi) => {
+            const isCorrect = oi === q.answer;
+            html += `<div class="opt ${isCorrect ? 'correct' : ''}">
+              <span class="opt-letter">${LETTERS[oi]}.</span>
+              <span>${opt}${isCorrect ? ' ✓' : ''}</span>
+            </div>`;
+          });
+          html += `</div></div></div>`;
+        });
+      });
+      document.getElementById('count').textContent = `${total} questions shown`;
+      return html;
+    }
+
+    function setFilter(f, btn) {
+      currentFilter = f;
+      document.querySelectorAll('.filter-bar button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applySearch();
+    }
+
+    function applySearch() {
+      const search = document.getElementById('search').value;
+      document.getElementById('content').innerHTML = buildHTML(currentFilter, search);
+    }
+
+    // Initial render
+    document.getElementById('content').innerHTML = buildHTML('all', '');
+  </script>
+</body>
+</html>
