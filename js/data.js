@@ -217,67 +217,50 @@ const LEVEL_CONFIG = [
 function buildFrenzyQuestions() {
   const frenzy = [];
 
-  // --- 20 MCQ-based T/F from ROAD_RULES ---
-  const rulesSample = shuffle([...ROAD_RULES]).slice(0, 20);
-  rulesSample.forEach(q => {
-    const isTrueVariant = Math.random() < 0.5;
-    if (isTrueVariant) {
-      frenzy.push({
-        q: `TRUE or FALSE: "${q.options[q.answer]}" is the correct answer to: ${q.q}`,
-        answer: true,
-        category: "rules"
-      });
-    } else {
-      const wrongIdx = (q.answer + 1 + Math.floor(Math.random() * 3)) % q.options.length;
-      frenzy.push({
-        q: `TRUE or FALSE: "${q.options[wrongIdx]}" is the correct answer to: ${q.q}`,
-        answer: false,
-        category: "rules"
-      });
-    }
+  // --- 20 ROAD RULES: straight MCQ ---
+  shuffle([...ROAD_RULES]).slice(0, 20).forEach(q => {
+    frenzy.push({
+      type: 'mcq',
+      category: 'rules',
+      q: q.q,
+      options: [...q.options],
+      answer: q.answer,
+    });
   });
 
-  // --- 12 Sign T/F ---
-  const signsSample = shuffle([...ROAD_SIGNS]).slice(0, 12);
-  signsSample.forEach(q => {
-    const isTrueVariant = Math.random() < 0.5;
-    if (isTrueVariant) {
-      frenzy.push({
-        q: `TRUE or FALSE: "${q.options[q.answer]}" is the correct answer to: ${q.q}`,
-        answer: true,
-        category: "signs"
-      });
-    } else {
-      const wrongIdx = (q.answer + 1 + Math.floor(Math.random() * 3)) % q.options.length;
-      frenzy.push({
-        q: `TRUE or FALSE: "${q.options[wrongIdx]}" is the correct answer to: ${q.q}`,
-        answer: false,
-        category: "signs"
-      });
-    }
+  // --- 12 ROAD SIGNS: show image, T/F on whether the label shown is correct ---
+  shuffle([...ROAD_SIGNS]).slice(0, 12).forEach(q => {
+    const showCorrect = Math.random() < 0.5;
+    const wrongs = q.options.filter((_, i) => i !== q.answer);
+    const shownLabel = showCorrect
+      ? q.options[q.answer]
+      : wrongs[Math.floor(Math.random() * wrongs.length)];
+    frenzy.push({
+      type: 'tf_sign',
+      category: 'signs',
+      correctLabel: q.options[q.answer],
+      shownLabel,
+      answer: showCorrect,
+    });
   });
 
-  // --- 6 Signal T/F ---
-  const signalsSample = shuffle([...HAND_SIGNALS]).slice(0, 6);
-  signalsSample.forEach(q => {
-    const isTrueVariant = Math.random() < 0.5;
-    if (isTrueVariant) {
-      frenzy.push({
-        q: `TRUE or FALSE: "${q.options[q.answer]}" is the correct answer to: ${q.q}`,
-        answer: true,
-        category: "signals"
-      });
-    } else {
-      const wrongIdx = (q.answer + 1 + Math.floor(Math.random() * 3)) % q.options.length;
-      frenzy.push({
-        q: `TRUE or FALSE: "${q.options[wrongIdx]}" is the correct answer to: ${q.q}`,
-        answer: false,
-        category: "signals"
-      });
-    }
+  // --- 6 HAND SIGNALS: question + one answer shown, T/F ---
+  shuffle([...HAND_SIGNALS]).slice(0, 6).forEach(q => {
+    const showCorrect = Math.random() < 0.5;
+    const wrongs = q.options.filter((_, i) => i !== q.answer);
+    const shownAnswer = showCorrect
+      ? q.options[q.answer]
+      : wrongs[Math.floor(Math.random() * wrongs.length)];
+    frenzy.push({
+      type: 'tf_signal',
+      category: 'signals',
+      q: q.q,
+      shownAnswer,
+      answer: showCorrect,
+    });
   });
 
-  return frenzy; // 38 total, in category order
+  return frenzy; // 38 total
 }
 
 function shuffle(arr) {
