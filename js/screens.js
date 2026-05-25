@@ -328,9 +328,12 @@ function renderFrenzy() {
   return `
   <div class="screen frenzy-screen">
     <div class="frenzy-header">
-      <div class="frenzy-timer ${timeClass}" id="frenzy-timer">⏱️ ${formatTime(f.timeLeft)}</div>
+      <div class="frenzy-timer-wrap">
+        <div class="frenzy-timer ${timeClass}" id="frenzy-timer">⏱️ ${formatTime(f.timeLeft)}</div>
+        <div class="frenzy-qcount">${f.qIdx + 1}/${totalQ}</div>
+      </div>
       <div class="frenzy-title">⚡ FRENZY!</div>
-      <div class="frenzy-qcount">${f.qIdx + 1}/${totalQ}</div>
+      <button class="frenzy-exit-btn" onclick="exitFrenzy()">✕</button>
     </div>
     <div class="frenzy-scores">
       ${scores.map(s => `<div class="fscore ${s.score >= s.pass ? 'fscore-pass' : ''}">${s.label} ${s.score}/${s.total}</div>`).join('')}
