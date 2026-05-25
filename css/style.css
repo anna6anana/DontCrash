@@ -29,6 +29,10 @@ html, body {
   overflow-x: hidden;
 }
 
+body.frenzy-mode {
+  background: #0f0f1a;
+}
+
 #app {
   min-height: 100vh;
   display: flex;
@@ -593,6 +597,8 @@ html, body {
   background: #0f0f1a;
   color: #fff;
   padding: 0;
+  min-height: 100vh;
+  width: 100%;
 }
 
 .frenzy-header {
@@ -625,6 +631,29 @@ html, body {
   font-size: 1.5rem;
   color: #a855f7;
   text-shadow: 0 0 12px #a855f7;
+}
+
+.frenzy-exit-btn {
+  background: #2a2a40;
+  border: none;
+  color: #888;
+  font-size: 1.1rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.frenzy-exit-btn:hover { background: #ef4444; color: #fff; }
+
+.frenzy-timer-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
 }
 
 .frenzy-qcount {
