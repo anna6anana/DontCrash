@@ -151,6 +151,12 @@ const ROAD_SIGNS = [
   { q: "A blue sign showing lanes with one blocked by a bar and an arrow means:", options: ["No through road to vehicular traffic in lane indicated", "Lane Closed", "Merging Traffic", "Keep Left Except When Overtaking"], answer: 0 },
   { q: "A blue square sign reading 'Keep Left Except When Overtaking' means:", options: ["Always stay in the left lane", "Keep Left Except When Overtaking", "No overtaking on the left", "Two-way traffic"], answer: 1 },
   { q: "A blue sign with a diagonal arrow indicating a direction means:", options: ["No through road to vehicular traffic in direction indicated", "Direction to be followed", "Merging Traffic", "Sharp deviation to the left"], answer: 0 },
+  { q: "A round red-bordered circle showing a red STOP board on a pole means:", options: ["Stop (School Children)", "Stop/Go — STOP", "No Entry", "Stop"], answer: 1 },
+  { q: "A round green-bordered circle showing a green GO board on a pole means:", options: ["Direction to be followed", "Parking Permitted", "Stop/Go — GO", "Give Way"], answer: 2 },
+  { q: "A round yellow sign with 'STOP Children' in red and black means:", options: ["Stop/Go — STOP", "No Entry", "Stop (School Children)", "Stop"], answer: 2 },
+  { q: "A round red-bordered sign with the number 50 inside means:", options: ["Minimum Speed Limit 50 km/h", "Maximum Speed Limit 50 km/h", "No entry for vehicles over 50 tonnes", "Road speed 50 zone ends"], answer: 1 },
+  { q: "A blue circle with a red diagonal slash through it means:", options: ["Stopping Prohibited", "No Entry", "No Overtaking", "Parking Prohibited"], answer: 3 },
+  { q: "A blue circle with a right-turn arrow inside means:", options: ["No Right Turn", "Pass this side", "Direction to be followed (right)", "No U-Turn"], answer: 2 },
 ];
 
 const HAND_SIGNALS = [
@@ -192,9 +198,9 @@ const LEVEL_CONFIG = [
     color: "#FFB347",
     colorDark: "#c97f00",
     subLevels: [
-      { title: "Signs 1", questions: ROAD_SIGNS.slice(0, 20) },
-      { title: "Signs 2", questions: ROAD_SIGNS.slice(20, 40) },
-      { title: "Signs 3", questions: ROAD_SIGNS.slice(40) },
+      { title: "Signs 1", questions: ROAD_SIGNS.slice(0, 21) },
+      { title: "Signs 2", questions: ROAD_SIGNS.slice(21, 42) },
+      { title: "Signs 3", questions: ROAD_SIGNS.slice(42) },
     ]
   },
   {
