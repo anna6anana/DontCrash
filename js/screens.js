@@ -270,10 +270,60 @@ function renderFrenzy() {
 
   const catLabels = { rules: '📋 Rules', signs: '🚧 Signs', signals: '🤚 Signals' };
   const scores = [
-    { label: '📋', score: f.rulesScore, pass: 16, total: 20 },
-    { label: '🚧', score: f.signsScore, pass: 10, total: 12 },
-    { label: '🤚', score: f.signalsScore, pass: 5, total: 6 },
+    { label: '📋', score: f.rulesScore,   pass: 16, total: 20 },
+    { label: '🚧', score: f.signsScore,   pass: 10, total: 12 },
+    { label: '🤚', score: f.signalsScore, pass: 5,  total: 6  },
   ];
+
+  let questionHTML = '';
+
+  if (q.type === 'mcq') {
+    // ── RULES: normal MCQ ──
+    questionHTML = `
+      <div class="question-card frenzy-qcard">
+        <div class="q-text frenzy-q">${q.q}</div>
+      </div>
+      <div class="frenzy-mcq-grid">
+        ${q.options.map((opt, i) => {
+          let cls = 'frenzy-opt-btn';
+          if (f.answered) {
+            if (i === q.answer) cls += ' correct';
+            else if (i === f.selected && i !== q.answer) cls += ' wrong';
+            else cls += ' dimmed';
+          }
+          return `<button class="${cls}" onclick="selectFrenzyMCQ(${i})">${opt}</button>`;
+        }).join('')}
+      </div>
+      ${f.answered ? `
+        <div class="feedback ${f.selected === q.answer ? 'feedback-correct' : 'feedback-wrong'}">
+          ${f.selected === q.answer ? '🎉 Correct!' : `😬 It's: <strong>${q.options[q.answer]}</strong>`}
+        </div>
+        <button class="btn btn-next" onclick="nextFrenzyQuestion()">
+          ${f.qIdx + 1 >= totalQ ? '🏁 See Results!' : 'Next →'}
+        </button>` : ''}`;
+
+  } else if (q.type === 'tf_sign') {
+    // ── SIGNS: show image, T/F on label ──
+    const imgSrc = getSignImage(q.correctLabel);
+    questionHTML = `
+      <div class="sign-image-wrap">
+        ${imgSrc ? `<img src="${imgSrc}" class="sign-img frenzy-sign-img" alt="road sign"/>` : ''}
+      </div>
+      <div class="question-card frenzy-qcard">
+        <div class="frenzy-tf-claim">Is this sign called:</div>
+        <div class="frenzy-tf-label">"${q.shownLabel}"</div>
+      </div>
+      ${renderTFButtons(f, q)}`;
+
+  } else if (q.type === 'tf_signal') {
+    // ── SIGNALS: show question + claimed answer, T/F ──
+    questionHTML = `
+      <div class="question-card frenzy-qcard">
+        <div class="frenzy-tf-claim">${q.q}</div>
+        <div class="frenzy-tf-label">"${q.shownAnswer}"</div>
+      </div>
+      ${renderTFButtons(f, q)}`;
+  }
 
   return `
   <div class="screen frenzy-screen">
@@ -289,34 +339,47 @@ function renderFrenzy() {
       <div class="progress-bar frenzy-bar" style="width:${progress}%"></div>
     </div>
     <div class="frenzy-cat-badge">${catLabels[q.category]}</div>
-    <div class="question-card frenzy-qcard">
-      <div class="q-text frenzy-q">${q.q}</div>
-    </div>
-    <div class="frenzy-tf-btns">
-      <button class="tf-btn true-btn ${f.answered && f.selected === true ? (q.answer === true ? 'correct' : 'wrong') : ''} ${f.answered && f.selected !== true && q.answer === true ? 'correct' : ''}"
-        onclick="selectFrenzyAnswer(true)">
-        ✅ TRUE
-      </button>
-      <button class="tf-btn false-btn ${f.answered && f.selected === false ? (q.answer === false ? 'correct' : 'wrong') : ''} ${f.answered && f.selected !== false && q.answer === false ? 'correct' : ''}"
-        onclick="selectFrenzyAnswer(false)">
-        ❌ FALSE
-      </button>
-    </div>
-    ${f.answered ? `
-    <div class="feedback ${f.selected === q.answer ? 'feedback-correct' : 'feedback-wrong'}">
-      ${f.selected === q.answer ? '🎉 Correct!' : `😬 That's ${q.answer ? 'TRUE' : 'FALSE'}!`}
-    </div>
-    <button class="btn btn-next" onclick="nextFrenzyQuestion()">
-      ${f.qIdx + 1 >= totalQ ? '🏁 See Results!' : 'Next →'}
-    </button>` : ''}
+    ${questionHTML}
   </div>`;
+}
+
+function renderTFButtons(f, q) {
+  const answered = f.answered;
+  const correct = f.selected === q.answer;
+  let trueClass = 'tf-btn true-btn';
+  let falseClass = 'tf-btn false-btn';
+  if (answered) {
+    if (q.answer === true)  trueClass  += ' correct';
+    if (q.answer === false) falseClass += ' correct';
+    if (f.selected === true  && !correct) trueClass  += ' wrong';
+    if (f.selected === false && !correct) falseClass += ' wrong';
+  }
+  return `
+    <div class="frenzy-tf-btns">
+      <button class="${trueClass}" onclick="selectFrenzyAnswer(true)">✅ TRUE</button>
+      <button class="${falseClass}" onclick="selectFrenzyAnswer(false)">❌ FALSE</button>
+    </div>
+    ${answered ? `
+      <div class="feedback ${correct ? 'feedback-correct' : 'feedback-wrong'}">
+        ${correct ? '🎉 Correct!' : `😬 That's ${q.answer ? 'TRUE' : 'FALSE'}!`}
+      </div>
+      <button class="btn btn-next" onclick="nextFrenzyQuestion()">
+        ${State.frenzy.qIdx + 1 >= State.frenzy.questions.length ? '🏁 See Results!' : 'Next →'}
+      </button>` : ''}`;
 }
 
 function setupFrenzyKeyboard() {
   document.onkeydown = (e) => {
     if (State.screen !== 'frenzy') { document.onkeydown = null; return; }
-    if (e.key === 'ArrowLeft' || e.key === 't' || e.key === 'T') selectFrenzyAnswer(true);
-    if (e.key === 'ArrowRight' || e.key === 'f' || e.key === 'F') selectFrenzyAnswer(false);
+    const q = State.frenzy.questions[State.frenzy.qIdx];
+    if (!q) return;
+    if (q.type === 'mcq') {
+      const map = { '1': 0, '2': 1, '3': 2, '4': 3 };
+      if (map[e.key] !== undefined) selectFrenzyMCQ(map[e.key]);
+    } else {
+      if (e.key === 't' || e.key === 'T') selectFrenzyAnswer(true);
+      if (e.key === 'f' || e.key === 'F') selectFrenzyAnswer(false);
+    }
     if ((e.key === 'Enter' || e.key === ' ') && State.frenzy.answered) nextFrenzyQuestion();
   };
 }
