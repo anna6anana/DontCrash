@@ -145,6 +145,9 @@ function renderLevel() {
   const total = s.questions.length;
   const progress = ((s.qIdx) / total) * 100;
 
+  const isSignsLevel = s.categoryId === 'signs';
+  const signImg = isSignsLevel ? getSignImage(q.options[q.answer]) : null;
+
   let html = `<div class="screen level-screen" style="--cat-color:${cfg.color}; --cat-dark:${cfg.colorDark}">
     <div class="level-header">
       <button class="btn-back" onclick="confirmBack()">✕</button>
@@ -155,6 +158,7 @@ function renderLevel() {
       <div class="progress-bar" style="width:${progress}%"></div>
     </div>
     ${s.inRepeat ? '<div class="repeat-banner">🔁 Review time! Let\'s fix those wrong answers!</div>' : ''}
+    ${signImg ? `<div class="sign-image-wrap"><img src="${signImg}" class="sign-img" alt="road sign"/></div>` : ''}
     <div class="question-card">
       <div class="q-num">Q${s.qIdx + 1} of ${total}</div>
       <div class="q-text">${q.q}</div>
